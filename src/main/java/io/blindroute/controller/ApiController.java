@@ -7,6 +7,7 @@ import io.blindroute.service.ApiService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -39,16 +40,14 @@ public class ApiController {
     }
 
     @PostMapping("/select/route")
-    public String SearchRoute(String stId
-//            , Authentication authentication
+    public String SearchRoute(String stId, Authentication authentication
     ) {
-//        if (authentication == null) {
-//            throw new RuntimeException();
-//        }
+        if (authentication == null|| ObjectUtils.isEmpty(stId)) {
+            return "fail";
+        }
 
-//        List<BusRoute> busRoutes = apiService.getBusRouteByString(searchKeyword);
 
-        return "ok";
+        return "success";
     }
 
     @GetMapping("/login/session")
