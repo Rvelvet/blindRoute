@@ -9,6 +9,6 @@ public interface ApiService {
 
     public List<BusStation> getBusStationsByString(String Search);
 
-    public List<BusRoute> getBusRouteByString(String Search);
+    public List<BusRoute> getBusRouteByString(String busRouteNm);
 
 }

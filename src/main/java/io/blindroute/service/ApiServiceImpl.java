@@ -57,16 +57,16 @@ public class ApiServiceImpl implements ApiService{
     }
 
     @Override
-    public List<BusRoute> getBusRouteByString(String Search) {
+    public List<BusRoute> getBusRouteByString(String busRouteNm) {
 
         String serviceKey =  environment.getProperty("api.serviceKey");
-//        Search = URLEncoder.encode(Search, Charset.forName("UTF-8"));
+        busRouteNm = URLEncoder.encode(busRouteNm, Charset.forName("UTF-8"));
         URI uri = UriComponentsBuilder.fromUriString("http://ws.bus.go.kr")
                 .path("/api/rest/stationinfo/getRouteByStation")
 //                .queryParam("arsId", URLEncoder.encode(Search, Charset.forName("UTF-8")))
                 .queryParam("serviceKey",
                         serviceKey)
-                .queryParam("arsId", Search)
+                .queryParam("arsId", busRouteNm)
                 .queryParam("resultType", "json")
                 .build(true)
                 .toUri();
