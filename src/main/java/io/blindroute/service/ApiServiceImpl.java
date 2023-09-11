@@ -1,9 +1,6 @@
 package io.blindroute.service;
 
-import io.blindroute.domain.api.BusRoute;
-import io.blindroute.domain.api.BusRouteBody;
-import io.blindroute.domain.api.BusStationBody;
-import io.blindroute.domain.api.BusStation;
+import io.blindroute.domain.api.*;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -77,5 +74,28 @@ public class ApiServiceImpl implements ApiService{
 
 
         return busRoute.getBody().getMsgBody().getItemList();
+    }
+
+    @Override
+    public List<Destination> getDestinationsByString(String busRouteId) {
+
+
+        String serviceKey =  environment.getProperty("api.serviceKey");
+        busRouteId = URLEncoder.encode(busRouteId, Charset.forName("UTF-8"));
+        URI uri = UriComponentsBuilder.fromUriString("http://ws.bus.go.kr")
+                .path("/api/rest/busRouteInfo/getStaionByRoute")
+//                .queryParam("arsId", URLEncoder.encode(Search, Charset.forName("UTF-8")))
+                .queryParam("serviceKey",
+                        serviceKey)
+                .queryParam("busRouteId", busRouteId)
+                .queryParam("resultType", "json")
+                .build(true)
+                .toUri();
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        ResponseEntity<DestinationBody> busDestination = restTemplate.getForEntity(uri, DestinationBody.class);
+
+        return busDestination.getBody().getMsgBody().getItemList();
     }
 }

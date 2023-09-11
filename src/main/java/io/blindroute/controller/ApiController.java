@@ -1,10 +1,7 @@
 package io.blindroute.controller;
 
 
-import io.blindroute.domain.api.BusRoute;
-import io.blindroute.domain.api.BusStation;
-import io.blindroute.domain.api.JsonBusRoute;
-import io.blindroute.domain.api.JsonBusStation;
+import io.blindroute.domain.api.*;
 import io.blindroute.service.ApiService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -59,6 +56,16 @@ public class ApiController {
             return "fail";
         }
         return "success";
+    }
+
+    @PostMapping("/search/destination")
+    public JsonDestination SearchDestination(String busRouteId, Authentication authentication) {
+        if (authentication == null|| ObjectUtils.isEmpty(busRouteId)) {
+            return new JsonDestination(null);
+        }
+        List<Destination> destinationList = apiService.getDestinationsByString(busRouteId);
+
+        return new JsonDestination(destinationList);
     }
 
     @GetMapping("/login/sessions")

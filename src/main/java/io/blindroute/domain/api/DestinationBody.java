@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BusRoute {
-    private String busRouteId;
-    private String busRouteNm;
-    private String busRouteAbrv;
+public class DestinationBody {
+    private DestinationMsgBody msgBody;
 }

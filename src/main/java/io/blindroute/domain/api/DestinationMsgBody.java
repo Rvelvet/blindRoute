@@ -4,11 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BusRoute {
-    private String busRouteId;
-    private String busRouteNm;
-    private String busRouteAbrv;
+public class DestinationMsgBody {
+    private List<Destination> itemList;
 }
