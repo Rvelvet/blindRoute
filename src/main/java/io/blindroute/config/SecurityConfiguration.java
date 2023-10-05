@@ -44,7 +44,7 @@ public class SecurityConfiguration {
                 .oauth2Login(oauth2 -> oauth2.successHandler(new AuthenticationSuccessHandler() {
                     @Override
                     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-                        response.sendRedirect("https://blindroute.web.app");
+                        response.sendRedirect("https://blindroute.web.app/authentication");
                     }
                 }))
                 .logout(oauth2 -> oauth2
@@ -52,7 +52,7 @@ public class SecurityConfiguration {
                         .logoutSuccessHandler(new LogoutSuccessHandler() {
                             @Override
                             public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-                                response.sendRedirect("https://blindroute.web.app");
+                                response.sendRedirect("https://blindroute.web.app/authentication");
                             }
                         })
                         .invalidateHttpSession(true)

@@ -2,13 +2,18 @@ package io.blindroute.controller;
 
 
 import io.blindroute.domain.api.*;
+import io.blindroute.repository.BusInfoRepository;
 import io.blindroute.service.ApiService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -18,7 +23,7 @@ public class ApiController {
 
     private final ApiService apiService;
 
-    public ApiController(ApiService apiService) {
+    public ApiController(ApiService apiService, BusInfoRepository repository) {
         this.apiService = apiService;
     }
 
@@ -51,10 +56,12 @@ public class ApiController {
 
 
     @PostMapping("/select/bus")
-    public String selectBusNm(String busRouteNm, Authentication authentication) {
+    public String selectBusNm(String arsId, String busRouteId, String busRouteNm, String busRouteAbrv, Authentication authentication) {
         if (authentication == null|| ObjectUtils.isEmpty(busRouteNm)) {
             return "fail";
         }
+        apiService.addBusInfo(arsId, new BusInfo(arsId, busRouteId, busRouteNm, busRouteAbrv));
+
         return "success";
     }
 
@@ -66,6 +73,48 @@ public class ApiController {
         List<Destination> destinationList = apiService.getDestinationsByString(busRouteId);
 
         return new JsonDestination(destinationList);
+    }
+
+//    @PostMapping("/image/test/byte")
+    public String handleFileUpload(@RequestParam("image") MultipartFile file) {
+        try {
+            byte[] bytes = file.getBytes();
+            // 여기서 bytes를 사용하여 이미지를 처리하거나 저장합니다.
+
+            file.transferTo(new File("C:\\Users\\NDH\\Spring\\blindroute\\"+file.getOriginalFilename()));
+            log.info("file received");
+            return "File uploaded successfully!";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "File upload failed: " + e.getMessage();
+        }
+    }
+
+    @PostMapping("/image/test/byte")
+    public ResponseEntity<byte[]> returnFile(@RequestParam("image") MultipartFile file) {
+        try {
+            byte[] bytes = file.getBytes();
+            // 여기서 bytes를 사용하여 이미지를 처리하거나 저장합니다.
+
+
+            return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(bytes);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.ofNullable(null);
+        }
+    }
+
+    @PostMapping("/select/wishroute")
+    public JsonBusInfo getBusInfoList(String arsId) {
+        return new JsonBusInfo(apiService.getList(arsId));
+    }
+
+    @PostMapping("/delete/bus")
+    public String deleteBusInfo(String arsId, String busRouteId, String busRouteNm, String busRouteAbrv) {
+
+        apiService.removeBusInfo(arsId, new BusInfo(arsId, busRouteId, busRouteNm, busRouteAbrv));
+
+        return "success";
     }
 
     @GetMapping("/login/sessions")
