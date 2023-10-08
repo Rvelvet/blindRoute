@@ -21,4 +21,13 @@ public interface ApiService {
 
     public List<BusInfo> getList(String arsId);
 
+    public boolean isArrived(String Key, String Name);
+
+    public void addGuest(String Key, String Name);
+
+    public void test(String arsId, BusInfo busInfo);
+
+    public void clearGuestInfo(String arsId, BusInfo busInfo);
+
+
 }

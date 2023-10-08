@@ -9,12 +9,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 @Slf4j
@@ -44,8 +46,8 @@ public class ApiController {
     }
 
     @PostMapping("/select/route")
-    public JsonBusRoute SearchRoute(String arsId, Authentication authentication
-    ) {
+    public JsonBusRoute SearchRoute(String arsId, Authentication authentication)
+    {
         if (authentication == null|| ObjectUtils.isEmpty(arsId)) {
             return new JsonBusRoute(null);
         }
@@ -61,6 +63,8 @@ public class ApiController {
             return "fail";
         }
         apiService.addBusInfo(arsId, new BusInfo(arsId, busRouteId, busRouteNm, busRouteAbrv));
+        OidcUser user = (OidcUser) authentication.getPrincipal();
+        apiService.addGuest(arsId+"|"+busRouteNm,(String) user.getClaims().get("sub"));
 
         return "success";
     }
@@ -113,12 +117,26 @@ public class ApiController {
     public String deleteBusInfo(String arsId, String busRouteId, String busRouteNm, String busRouteAbrv) {
 
         apiService.removeBusInfo(arsId, new BusInfo(arsId, busRouteId, busRouteNm, busRouteAbrv));
-
+        apiService.clearGuestInfo(arsId, new BusInfo(arsId, busRouteId, busRouteNm, busRouteAbrv));
         return "success";
     }
 
+    @PostMapping("/select/arrivalCheck")
+    public Boolean arrivalCheck(String arsId, String busRouteId, String busRouteNm, String busRouteAbrv, Authentication authentication) {
+        OidcUser user = (OidcUser) authentication.getPrincipal();
+        String name = (String) user.getClaims().get("sub");
+        return apiService.isArrived(arsId+"|"+busRouteNm,name);
+    }
+
+    @PostMapping("/test")
+    public void test(String arsId, String busRouteId, String busRouteNm, String busRouteAbrv) {
+        apiService.test(arsId, new BusInfo(arsId, busRouteId, busRouteNm, busRouteAbrv));
+    }
+
+
     @GetMapping("/login/sessions")
     public String login() {
+
         return "login";
     }
 }

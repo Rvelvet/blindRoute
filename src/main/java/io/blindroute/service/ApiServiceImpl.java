@@ -2,6 +2,7 @@ package io.blindroute.service;
 
 import io.blindroute.domain.api.*;
 import io.blindroute.repository.BusInfoRepository;
+import io.blindroute.repository.WaitingGuestRepository;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,11 +19,13 @@ public class ApiServiceImpl implements ApiService{
 
     private final Environment environment;
     private final BusInfoRepository repository;
+    private final WaitingGuestRepository guestRepository;
 
 
-    public ApiServiceImpl(Environment environment, BusInfoRepository repository) {
+    public ApiServiceImpl(Environment environment, BusInfoRepository repository, WaitingGuestRepository guestRepository) {
         this.environment = environment;
         this.repository = repository;
+        this.guestRepository = guestRepository;
     }
 
     @Override
@@ -115,4 +118,21 @@ public class ApiServiceImpl implements ApiService{
         return repository.getBusInfoList(arsId);
     }
 
+
+    public boolean isArrived(String Key, String Name) {
+        return guestRepository.isArrived(Key, Name);
+    }
+
+    public void addGuest(String Key, String Name) {
+        guestRepository.add(Key, Name);
+    }
+
+    public void test(String arsId, BusInfo busInfo) {
+        repository.remove(arsId, busInfo);
+        guestRepository.Arrived(arsId + "|" + busInfo.getBusRouteNm());
+    }
+
+    public void clearGuestInfo(String arsId, BusInfo busInfo) {
+        guestRepository.clear(arsId + "|" + busInfo.getBusRouteNm());
+    }
 }
