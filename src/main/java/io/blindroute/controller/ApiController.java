@@ -133,6 +133,11 @@ public class ApiController {
         apiService.test(arsId, new BusInfo(arsId, busRouteId, busRouteNm, busRouteAbrv));
     }
 
+    @GetMapping("/authentication")
+    public Boolean validation(Authentication authentication) {
+        return authentication != null;
+    }
+
 
     @GetMapping("/login/sessions")
     public String login() {
