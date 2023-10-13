@@ -77,6 +77,7 @@ public class SecurityConfiguration {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedOrigin("https://blindroute.web.app");
         configuration.addAllowedMethod("POST");
+        configuration.addAllowedMethod("GET");
         configuration.addAllowedHeader("*");
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
