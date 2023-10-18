@@ -95,7 +95,8 @@ public class ApiController {
     }
 
     @PostMapping("/image/test/byte")
-    public ResponseEntity<byte[]> returnFile(@RequestParam("image") MultipartFile file) {
+    public ResponseEntity<byte[]> returnFile(@RequestParam("image") MultipartFile file) //String arsId
+    {
         try {
             byte[] bytes = file.getBytes();
             // 여기서 bytes를 사용하여 이미지를 처리하거나 저장합니다.
@@ -136,6 +137,52 @@ public class ApiController {
     @GetMapping("/authentication")
     public Boolean validation(Authentication authentication) {
         return authentication != null;
+    }
+
+
+    @PostMapping("/bookmark/register")
+    public Boolean addBookmark(Authentication authentication, String arsId, String stNm, String busRouteId, String busRouteNm, String busRouteAbrv) {
+        if (authentication == null) {
+            return false;
+        }
+        OidcUser user = (OidcUser) authentication.getPrincipal();
+        String sub = (String) user.getClaims().get("sub");
+        Bookmark bookmark = new Bookmark(arsId, stNm, busRouteId, busRouteNm, busRouteAbrv);
+
+        return apiService.addBookmark(sub, bookmark);
+    }
+
+    @PostMapping("/bookmark/list")
+    public JsonBookmark getBookmarks(Authentication authentication) {
+        if (authentication == null) {
+            return new JsonBookmark(null);
+        }
+        OidcUser user = (OidcUser) authentication.getPrincipal();
+        String sub = (String)user.getClaims().get("sub");
+
+        return new JsonBookmark(apiService.getBookmarks(sub));
+    }
+
+    @PostMapping("/bookmark/remove")
+    public Boolean removeBookmark(Authentication authentication, String arsId, String stNm, String busRouteId, String busRouteNm, String busRouteAbrv) {
+        if (authentication == null) {
+            return false;
+        }
+        OidcUser user = (OidcUser) authentication.getPrincipal();
+        String sub = (String) user.getClaims().get("sub");
+        Bookmark bookmark = new Bookmark(arsId, stNm, busRouteId, busRouteNm, busRouteAbrv);
+
+        return apiService.removeBookmark(sub, bookmark);
+    }
+
+    @PostMapping("/bookmark/removeall")
+    public Boolean removeAllBookmark(Authentication authentication) {
+        if (authentication == null) {
+            return false;
+        }
+        OidcUser user = (OidcUser) authentication.getPrincipal();
+        String sub = (String) user.getClaims().get("sub");
+        return apiService.removeAllBookmark(sub);
     }
 
 

@@ -1,6 +1,7 @@
 package io.blindroute.service;
 
 import io.blindroute.domain.api.*;
+import io.blindroute.repository.BookmarkRepository;
 import io.blindroute.repository.BusInfoRepository;
 import io.blindroute.repository.WaitingGuestRepository;
 import org.springframework.core.env.Environment;
@@ -20,12 +21,14 @@ public class ApiServiceImpl implements ApiService{
     private final Environment environment;
     private final BusInfoRepository repository;
     private final WaitingGuestRepository guestRepository;
+    private final BookmarkRepository bookmarkRepository;
 
 
-    public ApiServiceImpl(Environment environment, BusInfoRepository repository, WaitingGuestRepository guestRepository) {
+    public ApiServiceImpl(Environment environment, BusInfoRepository repository, WaitingGuestRepository guestRepository, BookmarkRepository bookmarkRepository) {
         this.environment = environment;
         this.repository = repository;
         this.guestRepository = guestRepository;
+        this.bookmarkRepository = bookmarkRepository;
     }
 
     @Override
@@ -135,4 +138,21 @@ public class ApiServiceImpl implements ApiService{
     public void clearGuestInfo(String arsId, BusInfo busInfo) {
         guestRepository.clear(arsId + "|" + busInfo.getBusRouteNm());
     }
+
+    public boolean addBookmark(String key, Bookmark bookmark) {
+        return bookmarkRepository.add(key, bookmark);
+    }
+
+    public List<Bookmark> getBookmarks(String key) {
+        return bookmarkRepository.getBookmark(key);
+    }
+
+    public boolean removeBookmark(String key, Bookmark bookmark) {
+        return bookmarkRepository.remove(key, bookmark);
+    }
+
+    public boolean removeAllBookmark(String key) {
+        return bookmarkRepository.removeAll(key);
+    }
+
 }

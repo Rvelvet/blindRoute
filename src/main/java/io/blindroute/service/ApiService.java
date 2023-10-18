@@ -1,9 +1,6 @@
 package io.blindroute.service;
 
-import io.blindroute.domain.api.BusInfo;
-import io.blindroute.domain.api.BusRoute;
-import io.blindroute.domain.api.BusStation;
-import io.blindroute.domain.api.Destination;
+import io.blindroute.domain.api.*;
 
 import java.util.List;
 
@@ -29,5 +26,12 @@ public interface ApiService {
 
     public void clearGuestInfo(String arsId, BusInfo busInfo);
 
+    public boolean addBookmark(String key, Bookmark bookmark);
+
+    public boolean removeBookmark(String key, Bookmark bookmark);
+
+    public boolean removeAllBookmark(String key);
+
+    public List<Bookmark> getBookmarks(String key);
 
 }
