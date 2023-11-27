@@ -3,32 +3,46 @@ package io.blindroute.service;
 import io.blindroute.domain.api.*;
 import io.blindroute.repository.BookmarkRepository;
 import io.blindroute.repository.BusInfoRepository;
+import io.blindroute.repository.UrlRepository;
 import io.blindroute.repository.WaitingGuestRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+@Slf4j
 @Service
 public class ApiServiceImpl implements ApiService{
 
     private final Environment environment;
-    private final BusInfoRepository repository;
+    private final BusInfoRepository busInfoRepository;
     private final WaitingGuestRepository guestRepository;
     private final BookmarkRepository bookmarkRepository;
+    private final UrlRepository urlRepository;
 
 
-    public ApiServiceImpl(Environment environment, BusInfoRepository repository, WaitingGuestRepository guestRepository, BookmarkRepository bookmarkRepository) {
+    public ApiServiceImpl(Environment environment, BusInfoRepository busInfoRepository, WaitingGuestRepository guestRepository, BookmarkRepository bookmarkRepository, UrlRepository urlRepository) {
         this.environment = environment;
-        this.repository = repository;
+        this.busInfoRepository = busInfoRepository;
         this.guestRepository = guestRepository;
         this.bookmarkRepository = bookmarkRepository;
+        this.urlRepository = urlRepository;
     }
 
     @Override
@@ -110,15 +124,15 @@ public class ApiServiceImpl implements ApiService{
     }
 
     public void addBusInfo(String arsId, BusInfo busInfo) {
-        repository.add(arsId, busInfo);
+        busInfoRepository.add(arsId, busInfo);
     }
 
     public void removeBusInfo(String arsId, BusInfo busInfo) {
-        repository.remove(arsId, busInfo);
+        busInfoRepository.remove(arsId, busInfo);
     }
 
     public List<BusInfo> getList(String arsId ) {
-        return repository.getBusInfoList(arsId);
+        return busInfoRepository.getBusInfoList(arsId);
     }
 
 
@@ -131,7 +145,7 @@ public class ApiServiceImpl implements ApiService{
     }
 
     public void test(String arsId, BusInfo busInfo) {
-        repository.remove(arsId, busInfo);
+        busInfoRepository.remove(arsId, busInfo);
         guestRepository.Arrived(arsId + "|" + busInfo.getBusRouteNm());
     }
 
@@ -153,6 +167,45 @@ public class ApiServiceImpl implements ApiService{
 
     public boolean removeAllBookmark(String key) {
         return bookmarkRepository.removeAll(key);
+    }
+
+    public Boolean urlUpdate(String url) {
+
+        return urlRepository.update(url);
+    }
+
+    public boolean ImageProcess(byte[] image, String arsId){
+        String url = urlRepository.getURL();
+        if(url==null){
+            log.info("no url in the repository");
+            return false;
+        }
+
+        String  uri = UriComponentsBuilder.fromUriString(url).path("/upload").build().toString();
+        log.info("uri path = {}", uri);
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        Resource resource = new ByteArrayResource(image){
+            @Override
+            public String getFilename() {
+                return "image.jpg";
+            }
+        };
+        body.add("file", resource);
+
+        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
+
+        ResponseEntity<String> response = restTemplate.postForEntity(uri, request, String.class);
+
+
+        guestRepository.Arrived(arsId + "|" + response.getBody());
+
+
+        return true;
     }
 
 }

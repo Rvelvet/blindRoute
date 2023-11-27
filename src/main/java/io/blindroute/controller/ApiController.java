@@ -95,12 +95,13 @@ public class ApiController {
     }
 
     @PostMapping("/image/test/byte")
-    public ResponseEntity<byte[]> returnFile(@RequestParam("image") MultipartFile file) //String arsId
+    public ResponseEntity<byte[]> returnFile(@RequestParam("image") MultipartFile file, String arsId) //String arsId
     {
         try {
             byte[] bytes = file.getBytes();
             // 여기서 bytes를 사용하여 이미지를 처리하거나 저장합니다.
-
+//            apiService.ImageProcess(file);
+            apiService.ImageProcess(bytes, arsId);
 
             return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(bytes);
         } catch (Exception e) {
@@ -183,6 +184,12 @@ public class ApiController {
         OidcUser user = (OidcUser) authentication.getPrincipal();
         String sub = (String) user.getClaims().get("sub");
         return apiService.removeAllBookmark(sub);
+    }
+
+    @PostMapping("/url")
+    public String UrlUpdate(String url) {
+        apiService.urlUpdate(url);
+        return "success";
     }
 
 

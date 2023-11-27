@@ -1,6 +1,7 @@
 package io.blindroute.service;
 
 import io.blindroute.domain.api.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -33,5 +34,9 @@ public interface ApiService {
     public boolean removeAllBookmark(String key);
 
     public List<Bookmark> getBookmarks(String key);
+
+    public Boolean urlUpdate(String url);
+
+    public boolean ImageProcess(byte[] image, String arsId);
 
 }
