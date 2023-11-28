@@ -170,15 +170,15 @@ public class ApiServiceImpl implements ApiService{
     }
 
     public Boolean urlUpdate(String url) {
-
+        log.info("URL update : {}", url);
         return urlRepository.update(url);
     }
 
-    public boolean ImageProcess(byte[] image, String arsId){
+    public String ImageProcess(byte[] image, String arsId){
         String url = urlRepository.getURL();
         if(url==null){
             log.info("no url in the repository");
-            return false;
+            return "-1";
         }
 
         String  uri = UriComponentsBuilder.fromUriString(url).path("/upload").build().toString();
@@ -201,11 +201,12 @@ public class ApiServiceImpl implements ApiService{
 
         ResponseEntity<String> response = restTemplate.postForEntity(uri, request, String.class);
 
+        String busRouteNm = response.getBody();
 
-        guestRepository.Arrived(arsId + "|" + response.getBody());
+        guestRepository.Arrived(arsId + "|" + busRouteNm);
 
 
-        return true;
+        return busRouteNm;
     }
 
 }

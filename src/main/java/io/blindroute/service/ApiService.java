@@ -37,6 +37,6 @@ public interface ApiService {
 
     public Boolean urlUpdate(String url);
 
-    public boolean ImageProcess(byte[] image, String arsId);
+    public String ImageProcess(byte[] image, String arsId);
 
 }

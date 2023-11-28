@@ -95,18 +95,17 @@ public class ApiController {
     }
 
     @PostMapping("/image/test/byte")
-    public ResponseEntity<byte[]> returnFile(@RequestParam("image") MultipartFile file, String arsId) //String arsId
+    public String returnFile(@RequestParam("image") MultipartFile file, String arsId) //String arsId
     {
         try {
             byte[] bytes = file.getBytes();
             // 여기서 bytes를 사용하여 이미지를 처리하거나 저장합니다.
 //            apiService.ImageProcess(file);
-            apiService.ImageProcess(bytes, arsId);
 
-            return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(bytes);
+            return apiService.ImageProcess(bytes, arsId);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.ofNullable(null);
+            return "-1";
         }
     }
 
